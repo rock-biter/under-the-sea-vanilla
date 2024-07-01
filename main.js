@@ -274,6 +274,7 @@ const godRayShader = {
 		uResolution: globalUniforms.uResolution,
 		uTime: globalUniforms.uTime,
 		uCameraPosition: { value: camera.position },
+		uDeviceRatio: { value: 1 },
 	},
 	vertexShader: /*glsl */ `
         varying vec2 vUv;
@@ -291,13 +292,14 @@ const godRayShader = {
 				uniform vec2 uResolution;
 				uniform vec3 uCameraPosition;
 				uniform float uTime;
+				uniform float uDeviceRatio;
 
         varying vec2 vUv;
 
         void main()
         {
 
-						vec2 st = gl_FragCoord.xy / uResolution.xy;
+						vec2 st = gl_FragCoord.xy / (uResolution.xy * uDeviceRatio);
 
             vec4 color = texture2D(tDiffuse, vUv);
 						vec2 center = vec2(0.5,0.5);
@@ -418,14 +420,16 @@ function handleResize() {
 	// camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix()
 
+	const pixelRatio = Math.min(window.devicePixelRatio, 2)
+
 	godRayPass.uniforms.uResolution.value.x = sizes.width
 	godRayPass.uniforms.uResolution.value.y = sizes.height
+	godRayPass.uniforms.uDeviceRatio.value = pixelRatio
 
 	effectComposer.setSize(sizes.width, sizes.height)
-	effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+	effectComposer.setPixelRatio(pixelRatio)
 
 	renderer.setSize(sizes.width, sizes.height)
 
-	const pixelRatio = Math.min(window.devicePixelRatio, 2)
 	renderer.setPixelRatio(pixelRatio)
 }
