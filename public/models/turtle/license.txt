@@ -1,0 +1,11 @@
+Model Information:
+* title:	Model 47A - Loggerhead Sea Turtle
+* source:	https://sketchfab.com/3d-models/model-47a-loggerhead-sea-turtle-c438e81e796d41d9a6ae4cc147ef8d4f
+* author:	DigitalLife3D (https://sketchfab.com/DigitalLife3D)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Model 47A - Loggerhead Sea Turtle" (https://sketchfab.com/3d-models/model-47a-loggerhead-sea-turtle-c438e81e796d41d9a6ae4cc147ef8d4f) by DigitalLife3D (https://sketchfab.com/DigitalLife3D) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
