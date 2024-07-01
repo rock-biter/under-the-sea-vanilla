@@ -12,6 +12,30 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 // document.body.appendChild(stats.dom)
 
+let turtleMixer, turtle
+
+const glftLoader = new GLTFLoader()
+glftLoader.load('/models/turtle.glb', (gltf) => {
+	console.log(gltf)
+
+	const model = gltf.scene
+	model.scale.setScalar(0.04)
+	// model.position.y = 3
+	model.position.x = -1
+	model.position.z = -1
+	model.rotation.y = Math.PI * -0.75
+	model.rotation.order = 'YXZ'
+
+	turtle = model
+
+	scene.add(model)
+
+	turtleMixer = new THREE.AnimationMixer(gltf.scene)
+	const swim = turtleMixer.clipAction(gltf.animations[0])
+
+	swim.play()
+})
+
 const textureLoader = new THREE.TextureLoader()
 
 const spokeTexture = textureLoader.load('/textures/spoke-02.png')
@@ -31,7 +55,7 @@ sandNormalTexture.repeat.y = -1
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
-import { ShaderPass } from 'three/examples/jsm/Addons.js'
+import { GLTFLoader, ShaderPass } from 'three/examples/jsm/Addons.js'
 
 /**
  * Debug
@@ -212,7 +236,7 @@ const sizes = {
  */
 const fov = 60
 const camera = new THREE.PerspectiveCamera(fov, sizes.width / sizes.height, 0.1)
-camera.position.set(-4, 4, 6)
+camera.position.set(4, 6, 4)
 camera.lookAt(new THREE.Vector3(0, 2.5, 0))
 
 /**
@@ -221,6 +245,7 @@ camera.lookAt(new THREE.Vector3(0, 2.5, 0))
 // __helper_axes__
 const axesHelper = new THREE.AxesHelper(3)
 // scene.add(axesHelper)
+axesHelper.position.y = 2
 
 /**
  * renderer
@@ -319,6 +344,9 @@ const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.enablePan = false
 controls.autoRotate = true
+controls.minPolarAngle = Math.PI * 0.15
+controls.maxPolarAngle = Math.PI * 0.5
+controls.target.y = 2
 
 /**
  * Lights
@@ -333,6 +361,7 @@ scene.add(ambientLight, directionalLight)
  */
 // __clock__
 const clock = new THREE.Clock()
+let time = 0
 
 /**
  * frame loop
@@ -346,7 +375,8 @@ function tic() {
 	/**
 	 * tempo totale trascorso dall'inizio
 	 */
-	const time = clock.getElapsedTime()
+	const delta = clock.getElapsedTime() - time
+	time = time + delta
 
 	// __controls_update__
 	controls.update()
@@ -358,7 +388,17 @@ function tic() {
 	// renderer.render(scene, camera)
 	effectComposer.render()
 
-	directionalLight.position.x = Math.sin(time) * 3
+	if (turtleMixer) {
+		turtleMixer.update(delta)
+	}
+
+	if (turtle) {
+		turtle.position.y = 3 + Math.sin(time * 0.7) * 0.3
+		turtle.rotation.z = Math.PI * 0.05 * Math.sin(time * 0.7)
+		turtle.rotation.x = Math.PI * 0.07 * Math.cos(time * 0.7)
+	}
+
+	// directionalLight.position.x = Math.sin(time) * 3
 
 	// stats.end()
 
