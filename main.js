@@ -6,9 +6,9 @@ import sand_common from './src/shaders/sand/common.glsl'
 // __controls_import__
 // __gui_import__
 
-// const stats = new Stats()
-// stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-// document.body.appendChild(stats.dom)
+const stats = new Stats()
+stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom)
 
 const textureLoader = new THREE.TextureLoader()
 
@@ -35,12 +35,16 @@ import * as dat from 'lil-gui'
 const configs = {
 	example: 5,
 	sandColor: 0x686885,
+	height: 0.75,
 }
-// const gui = new dat.GUI()
-// gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
-// gui.addColor(configs, 'sandColor').onChange((val) => {
-// 	sandMaterial.color.set(val)
-// })
+const gui = new dat.GUI()
+gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
+gui
+	.add(configs, 'height', 0, 1, 0.01)
+	.onChange((val) => (globalUniforms.uHeight.value = val))
+gui.addColor(configs, 'sandColor').onChange((val) => {
+	sandMaterial.color.set(val)
+})
 
 const sandColor = new THREE.Color(configs.sandColor)
 
@@ -62,7 +66,7 @@ mesh.position.y += 0.5
 mesh.position.x = 10
 // scene.add(mesh)
 
-scene.fog = new THREE.Fog(0x111144, 0, 17)
+scene.fog = new THREE.Fog(0x111144, 0, 30)
 scene.background = new THREE.Color(0x111144)
 
 // __floor__
@@ -83,6 +87,7 @@ sandGeometry.rotateX(-Math.PI * 0.5)
 
 const globalUniforms = {
 	uTime: { value: 0 },
+	uHeight: { value: 1 },
 }
 
 sandMaterial.onBeforeCompile = (shader) => {
@@ -91,6 +96,7 @@ sandMaterial.onBeforeCompile = (shader) => {
 	shader.uniforms.uSandNoise = new THREE.Uniform(sandNoise)
 	shader.uniforms.uSandNormalTexture = new THREE.Uniform(sandNormalTexture)
 	shader.uniforms.uTime = globalUniforms.uTime
+	shader.uniforms.uHeight = globalUniforms.uHeight
 	shader.uniforms.uVoronoiNoise = new THREE.Uniform(voroniNoise)
 
 	let token = '#include <project_vertex>'
@@ -149,24 +155,18 @@ sandMaterial.onBeforeCompile = (shader) => {
 
 		// reduce duoble calc
 
-		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) + uTime * 0.2 ,uTime * 0.5) );
-		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) + uTime * 0.2 + 0.05 ,uTime * 0.5) );
-		// float d4 = 1. - worley(vec3(vUv * 5. + uTime + 0.002,uTime * 0.1) );
+		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 ,uTime * 0.5) );
+		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 + 0.05 ,uTime * 0.5) );
 
 		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.6;
-		
 
 		vec3 lightsColor = vec3(0.9,0.8,0.8);
 		d3 *= d3 * d3;
 		d4 *= d4 * d4;
 
-
-
 		diffuseColor.rgb += vec3(0.9,0.5,0.5) * d4 * 0.4;
 		diffuseColor.rgb += vec3(0.5,0.7,0.5) * d3 * 0.8;
-		// float lIntensity = 1. - texture(uVoronoiNoise,vUv + uTime * 0.1).r;
 
-		// diffuseColor.rgb += lightsColor * 0.5;
 	`
 	)
 }
@@ -205,7 +205,7 @@ const sizes = {
  */
 const fov = 60
 const camera = new THREE.PerspectiveCamera(fov, sizes.width / sizes.height, 0.1)
-camera.position.set(-4, 2, 4)
+camera.position.set(-4, 4, 6)
 camera.lookAt(new THREE.Vector3(0, 2.5, 0))
 
 /**
@@ -235,8 +235,8 @@ controls.enableDamping = true
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3)
 directionalLight.position.set(-4, 4, 4)
 scene.add(ambientLight, directionalLight)
 
@@ -250,7 +250,7 @@ const clock = new THREE.Clock()
  * frame loop
  */
 function tic() {
-	// stats.begin()
+	stats.begin()
 	/**
 	 * tempo trascorso dal frame precedente
 	 */
@@ -269,7 +269,7 @@ function tic() {
 
 	directionalLight.position.x = Math.sin(time) * 3
 
-	// stats.end()
+	stats.end()
 
 	requestAnimationFrame(tic)
 }
