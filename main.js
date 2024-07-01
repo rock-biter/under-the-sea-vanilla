@@ -3,14 +3,18 @@ import * as THREE from 'three'
 import Stats from 'stats.js'
 import sand_project_vertex from './src/shaders/sand/project_vertex.glsl'
 import sand_common from './src/shaders/sand/common.glsl'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // __controls_import__
 // __gui_import__
 
-const stats = new Stats()
-stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom)
+// const stats = new Stats()
+// stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+// document.body.appendChild(stats.dom)
 
 const textureLoader = new THREE.TextureLoader()
+
+const spokeTexture = textureLoader.load('/textures/spoke-02.png')
 
 const voroniNoise = textureLoader.load('/textures/voronoi-03.png')
 voroniNoise.wrapS = THREE.RepeatWrapping
@@ -27,6 +31,7 @@ sandNormalTexture.repeat.y = -1
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
+import { ShaderPass } from 'three/examples/jsm/Addons.js'
 
 /**
  * Debug
@@ -37,14 +42,14 @@ const configs = {
 	sandColor: 0x686885,
 	height: 0.75,
 }
-const gui = new dat.GUI()
-gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
-gui
-	.add(configs, 'height', 0, 1, 0.01)
-	.onChange((val) => (globalUniforms.uHeight.value = val))
-gui.addColor(configs, 'sandColor').onChange((val) => {
-	sandMaterial.color.set(val)
-})
+// const gui = new dat.GUI()
+// gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
+// gui
+// 	.add(configs, 'height', 0, 1, 0.01)
+// 	.onChange((val) => (globalUniforms.uHeight.value = val))
+// gui.addColor(configs, 'sandColor').onChange((val) => {
+// 	sandMaterial.color.set(val)
+// })
 
 const sandColor = new THREE.Color(configs.sandColor)
 
@@ -66,7 +71,7 @@ mesh.position.y += 0.5
 mesh.position.x = 10
 // scene.add(mesh)
 
-scene.fog = new THREE.Fog(0x111144, 0, 30)
+scene.fog = new THREE.Fog(0x111144, 0, 17)
 scene.background = new THREE.Color(0x111144)
 
 // __floor__
@@ -88,6 +93,7 @@ sandGeometry.rotateX(-Math.PI * 0.5)
 const globalUniforms = {
 	uTime: { value: 0 },
 	uHeight: { value: 1 },
+	uResolution: { value: new THREE.Vector2(0, 0) },
 }
 
 sandMaterial.onBeforeCompile = (shader) => {
@@ -223,6 +229,85 @@ const renderer = new THREE.WebGLRenderer({
 	logarithmicDepthBuffer: true,
 })
 document.body.appendChild(renderer.domElement)
+
+/**
+ * Post processing
+ */
+const effectComposer = new EffectComposer(renderer)
+effectComposer.setSize(sizes.width, sizes.height)
+effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+const renderPass = new RenderPass(scene, camera)
+effectComposer.addPass(renderPass)
+
+const godRayShader = {
+	uniforms: {
+		// uTexture: new Te
+		uSpokeTexture: new THREE.Uniform(spokeTexture),
+		tDiffuse: { value: null },
+		uResolution: globalUniforms.uResolution,
+		uTime: globalUniforms.uTime,
+		uCameraPosition: { value: camera.position },
+	},
+	vertexShader: /*glsl */ `
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+            vUv = uv;
+        }
+    `,
+	fragmentShader: /*glsl */ `
+        uniform sampler2D tDiffuse;
+				uniform sampler2D uSpokeTexture;
+				uniform vec2 uResolution;
+				uniform vec3 uCameraPosition;
+				uniform float uTime;
+
+        varying vec2 vUv;
+
+        void main()
+        {
+
+						vec2 st = gl_FragCoord.xy / uResolution.xy;
+
+            vec4 color = texture2D(tDiffuse, vUv);
+						vec2 center = vec2(0.5,0.5);
+						float dist = distance(vUv,center) + 0.3;
+
+						float godRayAlpha = texture(uSpokeTexture, vUv ).r * 0.2;
+
+						vec2 godPoint = vec2(0.5,3.9);
+						vec2 pos = godPoint - st;
+						
+						float r = length(pos)*0.480;
+						float a = atan(pos.y,pos.x);
+
+						float t = uTime + uCameraPosition.x * uCameraPosition.y * uCameraPosition.z * 0.01;
+
+						float f1 = abs(cos(a*90. + t * 2.)*sin(a*120. + t))*.8+.1;
+						float f2 = abs(cos(a*150. + t)* sin(a*250. + t))*.8+.1;
+						vec3 godRayColor1 = vec3(0.9,0.9,0.9 );
+						vec3 godRayColor2 = vec3(0.1,0.5,0.9 );
+
+						vec3 cornerColor = vec3(0.01,0.01,0.05);
+            // gl_FragColor = color + vec4(rayColor,dist);
+						gl_FragColor = mix(color, vec4(godRayColor1,1.),0.3 - smoothstep(f1,f1+0.9,r) * 0.3);
+						gl_FragColor = mix(gl_FragColor, vec4(godRayColor2,1.),0.2 - smoothstep(f2,f2+0.9,r) * 0.2);
+            gl_FragColor = mix(gl_FragColor, vec4(cornerColor,1.),dist);
+
+
+						#include <tonemapping_fragment>
+    				#include <colorspace_fragment>
+        }
+    `,
+}
+
+const godRayPass = new ShaderPass(godRayShader)
+effectComposer.addPass(godRayPass)
+
 handleResize()
 
 /**
@@ -231,6 +316,8 @@ handleResize()
 // __controls__
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
+controls.enablePan = false
+controls.autoRotate = true
 
 /**
  * Lights
@@ -250,7 +337,7 @@ const clock = new THREE.Clock()
  * frame loop
  */
 function tic() {
-	stats.begin()
+	// stats.begin()
 	/**
 	 * tempo trascorso dal frame precedente
 	 */
@@ -264,12 +351,15 @@ function tic() {
 	controls.update()
 
 	globalUniforms.uTime.value = time
+	godRayPass.uniforms.uTime.value = time
+	godRayPass.uniforms.uCameraPosition.value.set(...camera.position)
 
-	renderer.render(scene, camera)
+	// renderer.render(scene, camera)
+	effectComposer.render()
 
 	directionalLight.position.x = Math.sin(time) * 3
 
-	stats.end()
+	// stats.end()
 
 	requestAnimationFrame(tic)
 }
@@ -286,6 +376,12 @@ function handleResize() {
 
 	// camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix()
+
+	godRayPass.uniforms.uResolution.value.x = sizes.width
+	godRayPass.uniforms.uResolution.value.y = sizes.height
+
+	effectComposer.setSize(sizes.width, sizes.height)
+	effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 	renderer.setSize(sizes.width, sizes.height)
 
