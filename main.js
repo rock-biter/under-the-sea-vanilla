@@ -30,7 +30,7 @@ glftLoader.load('/models/turtle.glb', (gltf) => {
 
 	const meshes = []
 
-	model.castShadow = true
+	// model.castShadow = true
 
 	model.traverse((el) => {
 		if (el.material) {
@@ -308,7 +308,7 @@ for (let i = 0; i < size; i++) {
 		sandChunk.position.x = x
 		sandChunk.position.z = z
 
-		sandChunk.receiveShadow = true
+		// sandChunk.receiveShadow = true
 
 		console.log(sandChunk.position)
 
@@ -350,7 +350,7 @@ const renderer = new THREE.WebGLRenderer({
 	logarithmicDepthBuffer: true,
 })
 
-renderer.shadowMap.enabled = true
+// renderer.shadowMap.enabled = true
 document.body.appendChild(renderer.domElement)
 
 /**
