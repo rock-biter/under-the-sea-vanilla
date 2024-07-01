@@ -75,7 +75,7 @@ mvPosition = modelMatrix * mvPosition;
 
 // mvPosition.y += sand_noise(mvPosition.xz * 0.1);
 // modelPosition.y += sand_noise(uv);
-vUv = mvPosition.xz * 0.3;
+vUv = mvPosition.xz * 0.4;
 
 
 mvPosition = viewMatrix * mvPosition;
@@ -103,8 +103,8 @@ gl_Position = projectionMatrix * mvPosition;
 		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.9 * i;
 
 		vec3 lightsColor = vec3(0.9,0.8,0.8);
-		d3 *= d3 * d3 * d3;
-		d4 *= d4 * d4 * d4;
+		d3 *= d3 * d3 ;
+		d4 *= d4 * d4 ;
 
 		diffuseColor.rgb += vec3(0.9,0.5,0.5) * d4 * 0.7 * i;
 		diffuseColor.rgb += vec3(0.5,0.7,0.5) * d3 * 1. * i;
