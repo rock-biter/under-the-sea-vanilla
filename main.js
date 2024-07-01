@@ -83,7 +83,8 @@ const sandMaterial = new THREE.MeshStandardMaterial({
 	// flatShading: true,
 	// wireframe: true,
 })
-const sandGeometry = new THREE.PlaneGeometry(10, 10, 250, 250)
+const tile = 15
+const sandGeometry = new THREE.PlaneGeometry(tile, tile, tile * 25, tile * 25)
 sandGeometry.rotateX(-Math.PI * 0.5)
 
 // const planeG = new THREE.PlaneGeometry(10, 10)
@@ -183,8 +184,8 @@ const size = 3
 
 for (let i = 0; i < size; i++) {
 	for (let j = 0; j < size; j++) {
-		const x = i * 10 - size * 10 * 0.5 + 5
-		const z = j * 10 - size * 10 * 0.5 + 5
+		const x = i * tile - size * tile * 0.5 + 5
+		const z = j * tile - size * tile * 0.5 + 5
 
 		const sandChunk = new THREE.Mesh(sandGeometry, sandMaterial)
 		sandChunk.position.x = x
