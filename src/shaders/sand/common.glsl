@@ -25,7 +25,7 @@ float smin( float a, float b, float k )
 }
 
 float sand_noise(vec2 iUv) {
-  float t =  uTime * .06;
+  float t =  uTime * .1;
   iUv += t;
   float sinVal = iUv.x * 40. + iUv.y * 40. + cos(iUv.y * 7.) * 2.;
   float sandNoise = sin(sinVal - abs(sin(sinVal)) * 0.4);

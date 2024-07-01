@@ -16,7 +16,7 @@ let turtleMixer, turtle
 
 const glftLoader = new GLTFLoader()
 glftLoader.load('/models/turtle.glb', (gltf) => {
-	console.log(gltf)
+	console.log(gltf.scene)
 
 	const model = gltf.scene
 	model.scale.setScalar(0.04)
@@ -95,7 +95,7 @@ mesh.position.y += 0.5
 mesh.position.x = 10
 // scene.add(mesh)
 
-scene.fog = new THREE.Fog(0x111144, 0, 17)
+scene.fog = new THREE.Fog(0x111144, -3, 20)
 scene.background = new THREE.Color(0x111144)
 
 // __floor__
@@ -186,8 +186,8 @@ sandMaterial.onBeforeCompile = (shader) => {
 
 		// reduce duoble calc
 
-		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 ,uTime * 0.5) );
-		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 + 0.05 ,uTime * 0.5) );
+		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 ,uTime * 0.5) );
+		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 + 0.05 ,uTime * 0.5) );
 
 		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.6;
 
@@ -352,7 +352,7 @@ controls.target.y = 2
  * Lights
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
-const directionalLight = new THREE.DirectionalLight(0xffffff, 3)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 10)
 directionalLight.position.set(-4, 4, 4)
 scene.add(ambientLight, directionalLight)
 
