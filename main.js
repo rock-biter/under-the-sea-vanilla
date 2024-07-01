@@ -6,7 +6,7 @@ import sand_common from './src/shaders/sand/common.glsl'
 // __controls_import__
 // __gui_import__
 
-const stats = new Stats()
+// const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
 
@@ -36,11 +36,11 @@ const configs = {
 	example: 5,
 	sandColor: 0x686885,
 }
-const gui = new dat.GUI()
-gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
-gui.addColor(configs, 'sandColor').onChange((val) => {
-	sandMaterial.color.set(val)
-})
+// const gui = new dat.GUI()
+// gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
+// gui.addColor(configs, 'sandColor').onChange((val) => {
+// 	sandMaterial.color.set(val)
+// })
 
 const sandColor = new THREE.Color(configs.sandColor)
 
@@ -250,7 +250,7 @@ const clock = new THREE.Clock()
  * frame loop
  */
 function tic() {
-	stats.begin()
+	// stats.begin()
 	/**
 	 * tempo trascorso dal frame precedente
 	 */
@@ -269,7 +269,7 @@ function tic() {
 
 	directionalLight.position.x = Math.sin(time) * 3
 
-	stats.end()
+	// stats.end()
 
 	requestAnimationFrame(tic)
 }
