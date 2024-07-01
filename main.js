@@ -12,9 +12,29 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 // document.body.appendChild(stats.dom)
 
+const glftLoader = new GLTFLoader()
+
+// sea star
+
+// let fishMixer, fish
+// glftLoader.load('/models/fish.glb', (gltf) => {
+// 	console.log('fish', gltf)
+
+// 	const model = gltf.scene
+
+// 	model.scale.setScalar(0.5)
+// 	// model.rotation.y = Math.PI * 0.5
+// 	fish = model
+// 	scene.add(model)
+
+// 	fishMixer = new THREE.AnimationMixer(model)
+// 	const swim = fishMixer.clipAction(gltf.animations[0])
+
+// 	swim.play()
+// })
+
 let turtleMixer, turtle
 
-const glftLoader = new GLTFLoader()
 glftLoader.load('/models/turtle.glb', (gltf) => {
 	console.log(gltf.scene)
 
@@ -38,7 +58,7 @@ glftLoader.load('/models/turtle.glb', (gltf) => {
 		}
 	})
 
-	console.log(meshes)
+	// console.log(meshes)
 
 	meshes.forEach(({ material }) => {
 		material.onBeforeCompile = (shader) => {
@@ -114,7 +134,7 @@ gl_Position = projectionMatrix * mvPosition;
 	`
 			)
 
-			console.log(shader.fragmentShader)
+			// console.log(shader.fragmentShader)
 		}
 	})
 
@@ -146,6 +166,7 @@ sandNormalTexture.repeat.y = -1
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
 import { GLTFLoader, ShaderPass } from 'three/examples/jsm/Addons.js'
+import { vec3 } from 'three/examples/jsm/nodes/Nodes.js'
 
 /**
  * Debug
@@ -212,7 +233,7 @@ const globalUniforms = {
 }
 
 sandMaterial.onBeforeCompile = (shader) => {
-	console.log(shader.fragmentShader)
+	// console.log(shader.fragmentShader)
 
 	shader.uniforms.uSandNoise = new THREE.Uniform(sandNoise)
 	shader.uniforms.uSandNormalTexture = new THREE.Uniform(sandNormalTexture)
@@ -407,7 +428,7 @@ const godRayShader = {
 						vec2 godPoint = vec2(0.5,3.9);
 						vec2 pos = godPoint - st;
 						
-						float r = length(pos)*0.480;
+						float r = length(pos)*0.520;
 						float a = atan(pos.y,pos.x);
 
 						float t = uTime + uCameraPosition.x * uCameraPosition.y * uCameraPosition.z * 0.01;
@@ -491,12 +512,28 @@ function tic() {
 		turtleMixer.update(delta)
 	}
 
+	// if (fishMixer) {
+	// 	fishMixer.update(delta)
+	// }
 	if (turtle) {
 		turtle.position.y = 3 + Math.sin(time * 0.7) * 0.3
 		turtle.rotation.z = Math.PI * 0.05 * Math.sin(time * 0.7)
 		turtle.rotation.x = Math.PI * 0.07 * Math.cos(time * 0.7)
 	}
 
+	// if (fish) {
+	// 	let nextPos = new THREE.Vector3(
+	// 		+Math.sin(time * 2 * 0.05) * 10 + Math.cos(time * 0.5 * 0.05) * 5 - 3,
+	// 		0.5 + Math.sin(time * 0.7) * 0.3,
+	// 		-Math.sin(time * 0.5 * 0.05) * 5 + Math.cos(time * 2.5 * 0.05) * 10 + 0
+	// 	)
+	// 	fish.lookAt(nextPos)
+	// 	fish.position.copy(nextPos)
+
+	// 	// fish.rotation.y = -Math.PI * 0.5 // + (fish.position.x - prevX) * 0.1 * Math.PI
+
+	// 	// fish.position.z = -5 + Math.sin(time * 0.25) * 5 + Math.cos(time * 0.7) * 8
+	// }
 	// directionalLight.position.x = Math.sin(time) * 3
 
 	// stats.end()
