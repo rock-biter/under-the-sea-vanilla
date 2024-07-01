@@ -467,6 +467,8 @@ controls.autoRotate = true
 controls.minPolarAngle = Math.PI * 0.15
 controls.maxPolarAngle = Math.PI * 0.5
 controls.target.y = 2
+controls.maxDistance = 12
+controls.minDistance = 4
 
 /**
  * Lights
