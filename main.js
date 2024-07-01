@@ -30,6 +30,8 @@ glftLoader.load('/models/turtle.glb', (gltf) => {
 
 	const meshes = []
 
+	model.castShadow = true
+
 	model.traverse((el) => {
 		if (el.material) {
 			meshes.push(el)
@@ -286,6 +288,9 @@ sandMaterial.onBeforeCompile = (shader) => {
 		diffuseColor.rgb += vec3(0.9,0.5,0.5) * d4 * 0.4;
 		diffuseColor.rgb += vec3(0.5,0.7,0.5) * d3 * 0.8;
 
+		float shadow = length(rotate2D(vUv.xy,-3.14 * 0.25) * 10. * vec2(0.75,1.) - vec2(-0.5,-0.5));
+		diffuseColor.rgb = mix(diffuseColor.rgb,vec3(0.,0.,0.),1. - smoothstep(0.5,4.,shadow));
+
 	`
 	)
 }
@@ -302,6 +307,8 @@ for (let i = 0; i < size; i++) {
 		const sandChunk = new THREE.Mesh(sandGeometry, sandMaterial)
 		sandChunk.position.x = x
 		sandChunk.position.z = z
+
+		sandChunk.receiveShadow = true
 
 		console.log(sandChunk.position)
 
@@ -342,6 +349,8 @@ const renderer = new THREE.WebGLRenderer({
 	antialias: window.devicePixelRatio < 2,
 	logarithmicDepthBuffer: true,
 })
+
+renderer.shadowMap.enabled = true
 document.body.appendChild(renderer.domElement)
 
 /**
