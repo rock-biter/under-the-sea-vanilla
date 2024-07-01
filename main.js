@@ -28,6 +28,94 @@ glftLoader.load('/models/turtle.glb', (gltf) => {
 
 	turtle = model
 
+	const meshes = []
+
+	model.traverse((el) => {
+		if (el.material) {
+			meshes.push(el)
+		}
+	})
+
+	console.log(meshes)
+
+	meshes.forEach(({ material }) => {
+		material.onBeforeCompile = (shader) => {
+			shader.uniforms.uTime = globalUniforms.uTime
+
+			shader.vertexShader = shader.vertexShader.replace(
+				'#include <common>',
+				sand_common
+			)
+
+			shader.fragmentShader = shader.fragmentShader.replace(
+				'#include <common>',
+				sand_common
+			)
+
+			let token = '#include <project_vertex>'
+
+			shader.vertexShader = shader.vertexShader.replace(
+				token,
+				/*glsl */ `
+				vec4 mvPosition = vec4( transformed, 1.0 );
+
+#ifdef USE_BATCHING
+
+	mvPosition = batchingMatrix * mvPosition;
+
+#endif
+
+#ifdef USE_INSTANCING
+
+	mvPosition = instanceMatrix * mvPosition;
+
+#endif
+
+mvPosition = modelMatrix * mvPosition;
+
+// mvPosition.y += sand_noise(mvPosition.xz * 0.1);
+// modelPosition.y += sand_noise(uv);
+vUv = mvPosition.xz * 0.3;
+
+
+mvPosition = viewMatrix * mvPosition;
+
+gl_Position = projectionMatrix * mvPosition;
+				`
+			)
+
+			token = '#include <normal_fragment_maps>'
+
+			shader.fragmentShader = shader.fragmentShader.replace(
+				token,
+				/*glsl */ `
+		#include <normal_fragment_maps>
+
+		// float d3 = 1. - worley(vec3(vUv * 3. + vec2(sin(vUv.x),cos(vUv.y)) + uTime * 0.4,uTime * 0.4) );
+
+		// reduce duoble calc
+
+		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 ,uTime * 0.5) );
+		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 + 0.05 ,uTime * 0.5) );
+
+		float i = max(dot(normal,vec3(0,1,0)),0.);
+
+		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.9 * i;
+
+		vec3 lightsColor = vec3(0.9,0.8,0.8);
+		d3 *= d3 * d3 * d3;
+		d4 *= d4 * d4 * d4;
+
+		diffuseColor.rgb += vec3(0.9,0.5,0.5) * d4 * 0.7 * i;
+		diffuseColor.rgb += vec3(0.5,0.7,0.5) * d3 * 1. * i;
+
+	`
+			)
+
+			console.log(shader.fragmentShader)
+		}
+	})
+
 	scene.add(model)
 
 	turtleMixer = new THREE.AnimationMixer(gltf.scene)

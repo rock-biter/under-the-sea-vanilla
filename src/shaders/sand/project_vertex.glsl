@@ -1,5 +1,4 @@
 vec4 mvPosition = vec4( transformed, 1.0 );
-modelPosition = transformed;
 
 #ifdef USE_BATCHING
 
