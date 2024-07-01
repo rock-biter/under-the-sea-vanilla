@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import Stats from 'stats.js'
 import sand_project_vertex from './src/shaders/sand/project_vertex.glsl'
 import sand_common from './src/shaders/sand/common.glsl'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // __controls_import__
 // __gui_import__
 
@@ -11,6 +13,8 @@ import sand_common from './src/shaders/sand/common.glsl'
 // document.body.appendChild(stats.dom)
 
 const textureLoader = new THREE.TextureLoader()
+
+const spokeTexture = textureLoader.load('/textures/spoke-02.png')
 
 const voroniNoise = textureLoader.load('/textures/voronoi-03.png')
 voroniNoise.wrapS = THREE.RepeatWrapping
@@ -27,6 +31,7 @@ sandNormalTexture.repeat.y = -1
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
+import { ShaderPass } from 'three/examples/jsm/Addons.js'
 
 /**
  * Debug
@@ -35,9 +40,13 @@ import * as dat from 'lil-gui'
 const configs = {
 	example: 5,
 	sandColor: 0x686885,
+	height: 0.75,
 }
 // const gui = new dat.GUI()
 // gui.add(configs, 'example', 0, 10, 0.1).onChange((val) => console.log(val))
+// gui
+// 	.add(configs, 'height', 0, 1, 0.01)
+// 	.onChange((val) => (globalUniforms.uHeight.value = val))
 // gui.addColor(configs, 'sandColor').onChange((val) => {
 // 	sandMaterial.color.set(val)
 // })
@@ -83,6 +92,8 @@ sandGeometry.rotateX(-Math.PI * 0.5)
 
 const globalUniforms = {
 	uTime: { value: 0 },
+	uHeight: { value: 1 },
+	uResolution: { value: new THREE.Vector2(0, 0) },
 }
 
 sandMaterial.onBeforeCompile = (shader) => {
@@ -91,6 +102,7 @@ sandMaterial.onBeforeCompile = (shader) => {
 	shader.uniforms.uSandNoise = new THREE.Uniform(sandNoise)
 	shader.uniforms.uSandNormalTexture = new THREE.Uniform(sandNormalTexture)
 	shader.uniforms.uTime = globalUniforms.uTime
+	shader.uniforms.uHeight = globalUniforms.uHeight
 	shader.uniforms.uVoronoiNoise = new THREE.Uniform(voroniNoise)
 
 	let token = '#include <project_vertex>'
@@ -149,24 +161,18 @@ sandMaterial.onBeforeCompile = (shader) => {
 
 		// reduce duoble calc
 
-		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) + uTime * 0.2 ,uTime * 0.5) );
-		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) + uTime * 0.2 + 0.05 ,uTime * 0.5) );
-		// float d4 = 1. - worley(vec3(vUv * 5. + uTime + 0.002,uTime * 0.1) );
+		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 ,uTime * 0.5) );
+		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.2 + 0.05 ,uTime * 0.5) );
 
 		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.6;
-		
 
 		vec3 lightsColor = vec3(0.9,0.8,0.8);
 		d3 *= d3 * d3;
 		d4 *= d4 * d4;
 
-
-
 		diffuseColor.rgb += vec3(0.9,0.5,0.5) * d4 * 0.4;
 		diffuseColor.rgb += vec3(0.5,0.7,0.5) * d3 * 0.8;
-		// float lIntensity = 1. - texture(uVoronoiNoise,vUv + uTime * 0.1).r;
 
-		// diffuseColor.rgb += lightsColor * 0.5;
 	`
 	)
 }
@@ -205,7 +211,7 @@ const sizes = {
  */
 const fov = 60
 const camera = new THREE.PerspectiveCamera(fov, sizes.width / sizes.height, 0.1)
-camera.position.set(-4, 2, 4)
+camera.position.set(-4, 4, 6)
 camera.lookAt(new THREE.Vector3(0, 2.5, 0))
 
 /**
@@ -223,6 +229,85 @@ const renderer = new THREE.WebGLRenderer({
 	logarithmicDepthBuffer: true,
 })
 document.body.appendChild(renderer.domElement)
+
+/**
+ * Post processing
+ */
+const effectComposer = new EffectComposer(renderer)
+effectComposer.setSize(sizes.width, sizes.height)
+effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+const renderPass = new RenderPass(scene, camera)
+effectComposer.addPass(renderPass)
+
+const godRayShader = {
+	uniforms: {
+		// uTexture: new Te
+		uSpokeTexture: new THREE.Uniform(spokeTexture),
+		tDiffuse: { value: null },
+		uResolution: globalUniforms.uResolution,
+		uTime: globalUniforms.uTime,
+		uCameraPosition: { value: camera.position },
+	},
+	vertexShader: /*glsl */ `
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+            vUv = uv;
+        }
+    `,
+	fragmentShader: /*glsl */ `
+        uniform sampler2D tDiffuse;
+				uniform sampler2D uSpokeTexture;
+				uniform vec2 uResolution;
+				uniform vec3 uCameraPosition;
+				uniform float uTime;
+
+        varying vec2 vUv;
+
+        void main()
+        {
+
+						vec2 st = gl_FragCoord.xy / uResolution.xy;
+
+            vec4 color = texture2D(tDiffuse, vUv);
+						vec2 center = vec2(0.5,0.5);
+						float dist = distance(vUv,center) + 0.3;
+
+						float godRayAlpha = texture(uSpokeTexture, vUv ).r * 0.2;
+
+						vec2 godPoint = vec2(0.5,3.9);
+						vec2 pos = godPoint - st;
+						
+						float r = length(pos)*0.480;
+						float a = atan(pos.y,pos.x);
+
+						float t = uTime + uCameraPosition.x * uCameraPosition.y * uCameraPosition.z * 0.01;
+
+						float f1 = abs(cos(a*90. + t * 2.)*sin(a*120. + t))*.8+.1;
+						float f2 = abs(cos(a*150. + t)* sin(a*250. + t))*.8+.1;
+						vec3 godRayColor1 = vec3(0.9,0.9,0.9 );
+						vec3 godRayColor2 = vec3(0.1,0.5,0.9 );
+
+						vec3 cornerColor = vec3(0.01,0.01,0.05);
+            // gl_FragColor = color + vec4(rayColor,dist);
+						gl_FragColor = mix(color, vec4(godRayColor1,1.),0.3 - smoothstep(f1,f1+0.9,r) * 0.3);
+						gl_FragColor = mix(gl_FragColor, vec4(godRayColor2,1.),0.2 - smoothstep(f2,f2+0.9,r) * 0.2);
+            gl_FragColor = mix(gl_FragColor, vec4(cornerColor,1.),dist);
+
+
+						#include <tonemapping_fragment>
+    				#include <colorspace_fragment>
+        }
+    `,
+}
+
+const godRayPass = new ShaderPass(godRayShader)
+effectComposer.addPass(godRayPass)
+
 handleResize()
 
 /**
@@ -231,12 +316,14 @@ handleResize()
 // __controls__
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
+controls.enablePan = false
+controls.autoRotate = true
 
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3)
 directionalLight.position.set(-4, 4, 4)
 scene.add(ambientLight, directionalLight)
 
@@ -264,8 +351,11 @@ function tic() {
 	controls.update()
 
 	globalUniforms.uTime.value = time
+	godRayPass.uniforms.uTime.value = time
+	godRayPass.uniforms.uCameraPosition.value.set(...camera.position)
 
-	renderer.render(scene, camera)
+	// renderer.render(scene, camera)
+	effectComposer.render()
 
 	directionalLight.position.x = Math.sin(time) * 3
 
@@ -286,6 +376,12 @@ function handleResize() {
 
 	// camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix()
+
+	godRayPass.uniforms.uResolution.value.x = sizes.width
+	godRayPass.uniforms.uResolution.value.y = sizes.height
+
+	effectComposer.setSize(sizes.width, sizes.height)
+	effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 	renderer.setSize(sizes.width, sizes.height)
 

@@ -1,6 +1,7 @@
 #include <common>
 		
 uniform float uTime;
+uniform float uHeight;
 uniform sampler2D uSandNoise;
 uniform sampler2D uSandNormalTexture;
 uniform sampler2D uVoronoiNoise;
@@ -15,12 +16,29 @@ varying vec3 modelPosition;
 #endif
 #endif
 
-float sand_noise(vec2 iUv) {
-  float sandNoise = texture(uSandNoise,iUv).r;
-  sandNoise = sandNoise * 2. - 1.;
-  sandNoise *= 0.05;
+// root
+float smin( float a, float b, float k )
+{
+    k *= 2.0;
+    float x = b-a;
+    return 0.5*( a+b-sqrt(x*x+k*k) );
+}
 
-  return sandNoise;
+float sand_noise(vec2 iUv) {
+  // float t =  uTime * .05;
+  // iUv += t;
+  float sinVal = iUv.x * 40. + iUv.y * 40. + cos(iUv.y * 7.) * 2.;
+  float sandNoise = sin(sinVal - abs(sin(sinVal)) * 0.4);
+  sandNoise *= sandNoise;
+  sandNoise += sin(iUv.x * 5.) + cos(iUv.y * 5.);
+  // sandNoise *= sandNoise;
+  // sandNoise = smin(sandNoise, uHeight,0.3);
+  
+  float textureNoise = texture(uSandNoise,iUv * 0.7).r * 0.08;
+
+  sandNoise *= 0.07;
+
+  return sandNoise + textureNoise;
 }
 
 vec3 random3(float p) {
