@@ -317,9 +317,13 @@ sandMaterial.onBeforeCompile = (shader) => {
 		// float d3 = 1. - worley(vec3(vUv * 3. + vec2(sin(vUv.x),cos(vUv.y)) + uTime * 0.4,uTime * 0.4) );
 
 		// reduce duoble calc
+		vec2 a = vUv * 5.;
+		vec2 b = vUv * 5.;
+		vec2 c = a + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05;
+		float d = uTime * 0.5;
 
-		float d3 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 ,uTime * 0.5) );
-		float d4 = 1. - worley(vec3(vUv * 5. + vec2(sin(vUv.y * 20.) * 0.05,cos(vUv.x * 20.) * 0.05) - uTime * 0.05 + 0.05 ,uTime * 0.5) );
+		float d3 = 1. - worley(vec3(c ,d) );
+		float d4 = 1. - worley(vec3(c + 0.05 ,d) );
 
 		diffuseColor.rgb += vec3(0.2,0.6,0.8) * d3 * 0.6;
 
