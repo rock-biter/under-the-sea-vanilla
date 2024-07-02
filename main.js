@@ -167,6 +167,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
 import { GLTFLoader, ShaderPass } from 'three/examples/jsm/Addons.js'
 import { vec3 } from 'three/examples/jsm/nodes/Nodes.js'
+import Mixer from './src/Mixer'
 
 /**
  * Debug
@@ -484,6 +485,77 @@ scene.add(ambientLight, directionalLight)
 // __clock__
 const clock = new THREE.Clock()
 let time = 0
+
+// Mixer
+const sounds = [
+	{
+		name: 'Faded relaxing piano music',
+		author: '',
+		src: '/sounds/faded-relaxing-piano-music-218335.mp3',
+	},
+	// {
+	// 	name: 'Hold on relaxing piano music',
+	// 	author: '',
+	// 	src: '/sounds/hold-on-relaxing-piano-music-212489.mp3',
+	// },
+	// {
+	// 	name: 'Instrument',
+	// 	author: '',
+	// 	src: '/sounds/instrument-14092021-2-8365.mp3',
+	// },
+	{
+		name: 'Just relax',
+		author: '',
+		src: '/sounds/just-relax-11157.mp3',
+	},
+	{
+		name: 'Morning relaxing',
+		author: '',
+		src: '/sounds/morning-relaxing-144011.mp3',
+	},
+	{
+		name: 'Please calm my mind',
+		author: '',
+		src: '/sounds/please-calm-my-mind-125566.mp3',
+	},
+	// {
+	// 	name: 'Relaxing audio for yoga',
+	// 	author: '',
+	// 	src: '/sounds/relaxing-audio-for-yoga-131673.mp3',
+	// },
+	// {
+	// 	name: 'Relaxing birds and piano music',
+	// 	author: '',
+	// 	src: '/sounds/relaxing-birds-and-piano-music-137153.mp3',
+	// },
+	// {
+	// 	name: 'Relaxing music',
+	// 	author: '',
+	// 	src: '/sounds/relaxing-music-119247.mp3',
+	// },
+	// {
+	// 	name: 'Relaxing music - Vol 12',
+	// 	author: '',
+	// 	src: '/sounds/relaxing-music-vol12-131317.mp3',
+	// },
+	{
+		name: 'Relaxing piano 01',
+		author: '',
+		src: '/sounds/relaxing-piano-1-118623.mp3',
+	},
+	{
+		name: 'Relaxing piano 02',
+		author: '',
+		src: '/sounds/relaxing-piano-163391.mp3',
+	},
+	{
+		name: 'Relaxing piano 03',
+		author: '',
+		src: '/sounds/relaxing-piano-201831.mp3',
+	},
+]
+
+const mixer = new Mixer({ sounds, camera })
 
 /**
  * frame loop
