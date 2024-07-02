@@ -23,12 +23,12 @@
 		<div class="z-100" id="app">
 			<div
 				id="audio-player"
-				class="select-none fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
+				class="select-none pointer-events-none fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
 			>
 				<ul
 					id="tracks-list"
 					style="opacity: 0; visibility: hidden"
-					class="bg-black/60 rounded-lg"
+					class="bg-black/60 rounded-lg pointer-events-auto"
 				>
 					<!-- <li class="flex gap-4 items-center py-4 px-4">
 						<div
@@ -56,7 +56,7 @@
 				<div
 					style="opacity: 0; visibility: hidden"
 					id="player"
-					class="mt-2 bg-black/60 rounded-lg flex items-center gap-4 py-4 px-4"
+					class="mt-2 bg-black/60 pointer-events-auto rounded-lg flex items-center gap-4 py-4 px-4"
 				>
 					<div
 						id="context"
