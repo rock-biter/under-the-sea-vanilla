@@ -12,7 +12,17 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 // document.body.appendChild(stats.dom)
 
-const glftLoader = new GLTFLoader()
+const loadingManager = new THREE.LoadingManager()
+
+gsap.set(['#app'], { autoAlpha: 0 })
+
+loadingManager.onLoad = () => {
+	console.log('load')
+	gsap.to(['#app', 'canvas'], { autoAlpha: 1, duration: 0.2 })
+	gsap.to('#loading', { autoAlpha: 0, duration: 0.3 })
+}
+
+const glftLoader = new GLTFLoader(loadingManager)
 
 // sea star
 
@@ -168,6 +178,7 @@ import * as dat from 'lil-gui'
 import { GLTFLoader, ShaderPass } from 'three/examples/jsm/Addons.js'
 import { vec3 } from 'three/examples/jsm/nodes/Nodes.js'
 import Mixer from './src/Mixer'
+import gsap from 'gsap'
 
 /**
  * Debug
@@ -373,6 +384,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 
 // renderer.shadowMap.enabled = true
+gsap.set(renderer.domElement, { autoAlpha: 0 })
 document.body.appendChild(renderer.domElement)
 
 /**
@@ -555,7 +567,7 @@ const sounds = [
 	},
 ]
 
-const mixer = new Mixer({ sounds, camera })
+const mixer = new Mixer({ sounds, camera, loadingManager })
 
 /**
  * frame loop

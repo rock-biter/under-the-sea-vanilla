@@ -5,4 +5,5 @@
 html,
 body {
 	overflow: hidden;
+	font-family: 'Fira Mono', monospace;
 }

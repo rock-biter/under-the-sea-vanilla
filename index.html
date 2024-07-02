@@ -1,19 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: #000">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+		<link rel="icon" type="image/svg+xml" href="/icon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap"
+			rel="stylesheet"
+		/>
 		<title>Vite App</title>
 	</head>
-	<body>
+	<body style="background-color: #000">
+		<div
+			id="loading"
+			class="fixed text-white h-full w-full top-0 left-0 flex justify-center items-center"
+		>
+			<span class="animate-pulse"> loading </span>
+		</div>
+
 		<div class="z-100" id="app">
 			<div
 				id="audio-player"
-				class="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
+				class="select-none fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
 			>
-				<ul id="tracks-list" class="divide-y bg-black/60 rounded-lg">
-					<li class="flex gap-4 items-center py-4 px-4">
+				<ul
+					id="tracks-list"
+					style="opacity: 0; visibility: hidden"
+					class="bg-black/60 rounded-lg"
+				>
+					<!-- <li class="flex gap-4 items-center py-4 px-4">
 						<div
 							class="w-7 flex items-center justify-center hover:text-gray-300 cursor-pointer"
 						>
@@ -34,9 +51,10 @@
 							<p>Pinco Pallo</p>
 						</div>
 						<div>3:25</div>
-					</li>
+					</li> -->
 				</ul>
 				<div
+					style="opacity: 0; visibility: hidden"
 					id="player"
 					class="mt-2 bg-black/60 rounded-lg flex items-center gap-4 py-4 px-4"
 				>
@@ -56,18 +74,18 @@
 							/>
 						</svg>
 					</div>
-					<div class="grow flex items-center gap-4">
+					<div id="current-track-info" class="grow flex items-center gap-4">
 						<div class="grow">
-							<h3 class="text-white text-xs">Relaxig music</h3>
-							<p>Pinco Pallo</p>
+							<h3 class="text-white text-xs"></h3>
+							<p></p>
 						</div>
-						<div>3:25</div>
+						<div></div>
 					</div>
 					<div
 						id="player-controls"
 						class="shrink-0 flex w-max items-center gap-2"
 					>
-						<span id="back" class="hover:text-gray-300 cursor-pointer">
+						<span id="prev" class="hover:text-gray-300 cursor-pointer">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								height="24px"
@@ -82,11 +100,11 @@
 						</span>
 
 						<span
-							id="play-pause"
-							class="relative hover:text-gray-300 cursor-pointer"
+							id="play"
+							class="relative group pause hover:text-gray-300 cursor-pointer"
 						>
 							<svg
-								class="w-8 h-8"
+								class="w-8 h-8 group-[.play]:opacity-0"
 								xmlns="http://www.w3.org/2000/svg"
 								height="24px"
 								viewBox="0 -960 960 960"
@@ -98,7 +116,7 @@
 								/>
 							</svg>
 							<svg
-								class="w-8 h-8 absolute opacity-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+								class="w-8 h-8 absolute group-[.pause]:opacity-0 group-[.play]:text-blue-400 group-[.play]:opacity-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
 								xmlns="http://www.w3.org/2000/svg"
 								height="24px"
 								viewBox="0 -960 960 960"
@@ -138,7 +156,11 @@
 						</span>
 					</div>
 				</div>
-				<p class="pt-2 pb-6 text-white text-[12px] pl-14">
+				<p
+					style="opacity: 0; visibility: hidden"
+					id="pixabay"
+					class="pt-2 pb-6 text-white text-[12px] pl-14"
+				>
 					Audio tracks from Pixabay.com
 				</p>
 			</div>
