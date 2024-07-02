@@ -26,7 +26,7 @@ export default class Particles extends THREE.Object3D {
 			const j = i * 3
 			const x = (Math.random() - 0.5) * bounds
 			const z = (Math.random() - 0.5) * bounds
-			const y = Math.random() ** 2 * 0.5 * 10
+			const y = Math.random() ** 2 * 0.5 * 15
 
 			positions[j] = x
 			positions[j + 1] = y
