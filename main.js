@@ -8,6 +8,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 // __controls_import__
 // __gui_import__
 
+const debug = false //true
+
 // const stats = new Stats()
 // stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 // document.body.appendChild(stats.dom)
@@ -179,6 +181,7 @@ import { GLTFLoader, ShaderPass } from 'three/examples/jsm/Addons.js'
 import { vec3 } from 'three/examples/jsm/nodes/Nodes.js'
 import Mixer from './src/Mixer'
 import gsap from 'gsap'
+import Particles from './src/Particles'
 
 /**
  * Debug
@@ -218,8 +221,10 @@ mesh.position.y += 0.5
 mesh.position.x = 10
 // scene.add(mesh)
 
-scene.fog = new THREE.Fog(0x111144, -3, 20)
-scene.background = new THREE.Color(0x111144)
+if (!debug) {
+	scene.fog = new THREE.Fog(0x111144, -3, 20)
+	scene.background = new THREE.Color(0x111144)
+}
 
 // __floor__
 /**
@@ -233,6 +238,10 @@ const sandMaterial = new THREE.MeshStandardMaterial({
 const tile = 15
 const sandGeometry = new THREE.PlaneGeometry(tile, tile, tile * 25, tile * 25)
 sandGeometry.rotateX(-Math.PI * 0.5)
+
+const particles = new Particles({ numbers: 1000, bounds: tile * 3 })
+console.log(particles.particles)
+scene.add(particles)
 
 // const planeG = new THREE.PlaneGeometry(10, 10)
 // const planeM = new THREE.MeshStandardMaterial({ color: 'white' })
@@ -334,8 +343,8 @@ const size = 3
 
 for (let i = 0; i < size; i++) {
 	for (let j = 0; j < size; j++) {
-		const x = i * tile - size * tile * 0.5 + 5
-		const z = j * tile - size * tile * 0.5 + 5
+		const x = i * tile - size * tile * 0.5 + tile * 0.5
+		const z = j * tile - size * tile * 0.5 + tile * 0.5
 
 		const sandChunk = new THREE.Mesh(sandGeometry, sandMaterial)
 		sandChunk.position.x = x
@@ -380,7 +389,7 @@ axesHelper.position.y = 2
  */
 const renderer = new THREE.WebGLRenderer({
 	antialias: window.devicePixelRatio < 2,
-	logarithmicDepthBuffer: true,
+	// logarithmicDepthBuffer: true,
 })
 
 // renderer.shadowMap.enabled = true
@@ -475,14 +484,16 @@ handleResize()
 // __controls__
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
-controls.enablePan = false
 controls.autoRotate = true
-controls.minPolarAngle = Math.PI * 0.15
-controls.maxPolarAngle = Math.PI * 0.5
-controls.target.y = 2
-controls.maxDistance = 12
-controls.minDistance = 4
+if (!debug) {
+	controls.enablePan = false
 
+	controls.minPolarAngle = Math.PI * 0.15
+	controls.maxPolarAngle = Math.PI * 0.5
+	controls.target.y = 2
+	controls.maxDistance = 12
+	controls.minDistance = 4
+}
 /**
  * Lights
  */
@@ -590,6 +601,7 @@ function tic() {
 	globalUniforms.uTime.value = time
 	godRayPass.uniforms.uTime.value = time
 	godRayPass.uniforms.uCameraPosition.value.set(...camera.position)
+	particles.uniforms.uTime.value = time
 
 	// renderer.render(scene, camera)
 	effectComposer.render()
