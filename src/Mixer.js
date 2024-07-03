@@ -106,7 +106,9 @@ export default class Mixer {
 
 			this.domCurrentTrackInfo.innerHTML = `
       <div class="grow">
-        <h3 class="text-white text-xs">${track.name}</h3>
+        <h3 class="text-white text-xs text-ellipsis whitespace-nowrap overflow-hidden">${
+					track.name
+				}</h3>
         <p>${track.author}</p>
       </div>
       <div class="text-xs">${this.getFormattedDuration(track)}</div>
@@ -194,8 +196,10 @@ export default class Mixer {
 		})
 
 		this.domCurrentTrackInfo.innerHTML = `
-      <div class="grow">
-        <h3 class="text-white text-xs">${this.playlist[0].name}</h3>
+      <div class="grow truncate min-w-0">
+        <h3 class="text-white text-xs truncate min-w-0">${
+					this.playlist[0].name
+				}</h3>
         <p>${this.playlist[0].author}</p>
       </div>
       <div class="text-xs">${this.getFormattedDuration(this.playlist[0])}</div>
@@ -250,6 +254,7 @@ export default class Mixer {
 			return {
 				audio,
 				name: this.sounds[i].name,
+				author: this.sounds[i].author,
 				domElement: this.getTrackDomElement(this.sounds[i], audio),
 			}
 		})

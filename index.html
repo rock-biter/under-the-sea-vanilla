@@ -23,7 +23,7 @@
 		<div class="z-100" id="app">
 			<div
 				id="audio-player"
-				class="select-none pointer-events-none fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
+				class="select-none py-4 px-4 pointer-events-none fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[485px] w-full text-gray-600 text-[10px]"
 			>
 				<ul
 					id="tracks-list"
@@ -74,7 +74,10 @@
 							/>
 						</svg>
 					</div>
-					<div id="current-track-info" class="grow flex items-center gap-4">
+					<div
+						id="current-track-info"
+						class="grow flex items-center gap-4 truncate"
+					>
 						<div class="grow">
 							<h3 class="text-white text-xs"></h3>
 							<p></p>
@@ -156,13 +159,13 @@
 						</span>
 					</div>
 				</div>
-				<p
+				<!-- <p
 					style="opacity: 0; visibility: hidden"
 					id="pixabay"
 					class="pt-2 pb-6 text-white text-[12px] pl-14"
 				>
 					Audio tracks from Pixabay.com
-				</p>
+				</p> -->
 			</div>
 		</div>
 		<script type="module" src="/main.js"></script>

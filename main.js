@@ -377,7 +377,7 @@ const sizes = {
  */
 const fov = 60
 const camera = new THREE.PerspectiveCamera(fov, sizes.width / sizes.height, 0.1)
-camera.position.set(4, 6, 4)
+camera.position.set(3, 1.5, 3)
 camera.lookAt(new THREE.Vector3(0, 2.5, 0))
 
 /**
@@ -517,7 +517,7 @@ let time = 0
 const sounds = [
 	{
 		name: 'Faded relaxing piano music',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/faded-relaxing-piano-music-218335.mp3',
 	},
 	// {
@@ -532,17 +532,17 @@ const sounds = [
 	// },
 	{
 		name: 'Just relax',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/just-relax-11157.mp3',
 	},
 	{
 		name: 'Morning relaxing',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/morning-relaxing-144011.mp3',
 	},
 	{
 		name: 'Please calm my mind',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/please-calm-my-mind-125566.mp3',
 	},
 	// {
@@ -567,17 +567,17 @@ const sounds = [
 	// },
 	{
 		name: 'Relaxing piano 01',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/relaxing-piano-1-118623.mp3',
 	},
 	{
 		name: 'Relaxing piano 02',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/relaxing-piano-163391.mp3',
 	},
 	{
 		name: 'Relaxing piano 03',
-		author: '',
+		author: 'Pixabay.com',
 		src: '/sounds/relaxing-piano-201831.mp3',
 	},
 ]
