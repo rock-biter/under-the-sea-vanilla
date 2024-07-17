@@ -516,6 +516,11 @@ let time = 0
 // Mixer
 const sounds = [
 	{
+		name: 'Deep Ocean',
+		author: 'Ahmed Znagui',
+		src: '/sounds/deep-ocean-ahmed-znagui.mp3',
+	},
+	{
 		name: 'Faded relaxing piano music',
 		author: 'Pixabay.com',
 		src: '/sounds/faded-relaxing-piano-music-218335.mp3',
