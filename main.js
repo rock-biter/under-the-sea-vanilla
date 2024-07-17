@@ -522,7 +522,7 @@ const sounds = [
 	},
 	{
 		name: 'Faded relaxing piano music',
-		author: 'Pixabay.com',
+		author: 'Calvin Clavier - Pixabay.com',
 		src: '/sounds/faded-relaxing-piano-music-218335.mp3',
 	},
 	// {
@@ -537,17 +537,17 @@ const sounds = [
 	// },
 	{
 		name: 'Just relax',
-		author: 'Pixabay.com',
+		author: 'Lesfm - Pixabay.com',
 		src: '/sounds/just-relax-11157.mp3',
 	},
 	{
 		name: 'Morning relaxing',
-		author: 'Pixabay.com',
+		author: 'Onetent - Pixabay.com',
 		src: '/sounds/morning-relaxing-144011.mp3',
 	},
 	{
 		name: 'Please calm my mind',
-		author: 'Pixabay.com',
+		author: 'Lesfm - Pixabay.com',
 		src: '/sounds/please-calm-my-mind-125566.mp3',
 	},
 	// {
@@ -577,12 +577,12 @@ const sounds = [
 	},
 	{
 		name: 'Relaxing piano 02',
-		author: 'Pixabay.com',
+		author: 'Music For Videos - Pixabay.com',
 		src: '/sounds/relaxing-piano-163391.mp3',
 	},
 	{
 		name: 'Relaxing piano 03',
-		author: 'Pixabay.com',
+		author: 'Calvin Clavier - Pixabay.com',
 		src: '/sounds/relaxing-piano-201831.mp3',
 	},
 ]
