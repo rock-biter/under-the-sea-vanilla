@@ -540,11 +540,11 @@ const sounds = [
 		author: 'Lesfm - Pixabay.com',
 		src: '/sounds/just-relax-11157.mp3',
 	},
-	{
-		name: 'Morning relaxing',
-		author: 'Onetent - Pixabay.com',
-		src: '/sounds/morning-relaxing-144011.mp3',
-	},
+	// {
+	// 	name: 'Morning relaxing',
+	// 	author: 'Onetent - Pixabay.com',
+	// 	src: '/sounds/morning-relaxing-144011.mp3',
+	// },
 	{
 		name: 'Please calm my mind',
 		author: 'Lesfm - Pixabay.com',
@@ -575,11 +575,11 @@ const sounds = [
 		author: 'Pixabay.com',
 		src: '/sounds/relaxing-piano-1-118623.mp3',
 	},
-	{
-		name: 'Relaxing piano 02',
-		author: 'Music For Videos - Pixabay.com',
-		src: '/sounds/relaxing-piano-163391.mp3',
-	},
+	// {
+	// 	name: 'Relaxing piano 02',
+	// 	author: 'Music For Videos - Pixabay.com',
+	// 	src: '/sounds/relaxing-piano-163391.mp3',
+	// },
 	{
 		name: 'Relaxing piano 03',
 		author: 'Calvin Clavier - Pixabay.com',
